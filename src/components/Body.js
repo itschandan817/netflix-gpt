@@ -1,8 +1,7 @@
-import { createBrowserRouter } from 'react-router-dom'
-import React from 'react'
-import Loging from './Loging'
-import Browse from './Browse'
-import { RouterProvider } from 'react-router-dom'
+import { createBrowserRouter} from 'react-router-dom';
+import Loging from './Loging';
+import Browse from './Browse';
+import { RouterProvider } from 'react-router-dom';
 
 const Body = () => {
     const appRoter =  createBrowserRouter([

@@ -1,11 +1,20 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react';
 import Header from './Header';
-import {checkValidata} from "../utils/validate"
+import {checkValidata} from "../utils/validate";
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
+import {updateProfile } from "firebase/auth";
+import { useDispatch } from 'react-redux';
+import { USER_AVTAR } from '../utils/constants';
 
 
 const Loging = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] =   useState(null);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
   const name = useRef(null);
   const email = useRef(null);
@@ -14,6 +23,45 @@ const Loging = () => {
   const handleButtonClick = () =>{
     const message = checkValidata(email.current.value, password.current.value );
     setErrorMessage(message);
+    if(message) return;
+   
+    if(!isSignInForm){
+      // Sign Up Logic
+      createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+        .then((userCredential) => {
+          // Signed up 
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value, photoURL: USER_AVTAR
+          }).then(() => {
+            
+            navigate("/")
+          }).catch((error) => {
+            setErrorMessage(error.message )
+          });
+          console.log(user);
+          
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    }else{
+
+      // Sign In Logic
+      signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode+"-"+errorMessage)
+        }); 
+    }
+
   }
 
   const toggleSignInForm = () =>{ 
@@ -24,7 +72,7 @@ const Loging = () => {
       <Header/>
       <div className='absolute'>
         <img 
-         src='https://assets.nflxext.com/ffe/siteui/vlv3/51c1d7f7-3179-4a55-93d9-704722898999/be90e543-c951-40d0-9ef5-e067f3e33d16/IN-en-20240610-popsignuptwoweeks-perspective_alpha_website_large.jpg'
+         src= "https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
          alt='bglogo'
         />
 
